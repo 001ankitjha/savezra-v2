@@ -66,6 +66,33 @@ async function handleIncoming(req, res) {
 
           if (!from || !messageId) continue;
 
+          // ----- NEW: log who is messaging Savezra -----
+          const contact =
+            Array.isArray(value.contacts) && value.contacts.length > 0
+              ? value.contacts[0]
+              : null;
+          const name = contact && contact.profile ? contact.profile.name : null;
+
+          let textPreview = null;
+          if (message.type === 'text') {
+            textPreview = message.text && message.text.body ? message.text.body : null;
+          } else if (message.type === 'audio') {
+            textPreview = '[audio message]';
+          } else if (message.type === 'image') {
+            textPreview = '[image message]';
+          } else {
+            textPreview = `[${message.type} message]`;
+          }
+
+          logger.info('Incoming WhatsApp message', {
+            from,
+            name,
+            text: textPreview,
+            type: message.type,
+            messageId,
+          });
+          // ---------------------------------------------
+
           // Deduplicate (WhatsApp can send the same webhook multiple times)
           if (processingMessages.has(messageId)) {
             logger.debug('Duplicate message, skipping', { messageId });
