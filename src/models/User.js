@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+     // NEW: internal stable ID for this user (used by older index userId_1)
+    userId: {
+      type: String,
+      default: null,
+    },
     name: {
       type: String,
       default: null,
